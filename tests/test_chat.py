@@ -6,9 +6,6 @@ from app.main import app
 from app.api.models import ChatRequest
 
 
-@pytest.fixture
-def client():
-    return TestClient(app)
 
 
 def parse_sse(lines) -> list[tuple[str, dict]]:

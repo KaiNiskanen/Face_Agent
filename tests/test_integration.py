@@ -1,12 +1,9 @@
 import os
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+import pytest
 from app.api.models import ChatRequest
 
-@pytest.fixture
-def client():
-    return TestClient(app)
+
 
 def parse_sse(lines) -> list[tuple[str, dict]]:
     import json

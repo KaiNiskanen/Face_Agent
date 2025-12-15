@@ -2,11 +2,13 @@ import time
 import asyncio
 import uuid
 from typing import AsyncGenerator
-from fastapi import APIRouter
+from typing import AsyncGenerator
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.logging import get_logger
 from app.api.models import ChatRequest, sse_event
 from app.config import settings
+from app.api.deps import verify_token
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage
 
@@ -59,7 +61,7 @@ async def stream_agent(state: FaceAgentState, request_id: str) -> AsyncGenerator
         yield sse_event("done", {})
 
 @router.post("/chat")
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest, user_id: str = Depends(verify_token)):
     request_id = str(uuid.uuid4())[:8]
     
     selection_count = len(request.selected_ids)
@@ -67,7 +69,7 @@ async def chat(request: ChatRequest):
     thumb_urls_used = min(thumb_urls_received, 4)
     thumb_urls_dropped = thumb_urls_received - thumb_urls_used
     logger.info(
-        f"[{request_id}] request | "
+        f"[{request_id}] request | user_id={user_id} | "
         f"project_id={request.project_id} "
         f"selection_count={selection_count} "
         f"thumb_urls_received={thumb_urls_received} "
