@@ -8,6 +8,7 @@ load_dotenv()
 @dataclass
 class Settings:
     MODEL_NAME: str
+    DB_URI: str
     # New Auth Fields
     SUPABASE_URL: str
     SUPABASE_JWT_SECRET: str
@@ -35,6 +36,7 @@ def _load_settings() -> Settings:
     return Settings(
         # Existing
         MODEL_NAME=os.getenv("MODEL_NAME", "gpt-4o"),
+        DB_URI=_required("POSTGRES_DB_URL"),
         
         # New
         SUPABASE_URL=_required("SUPABASE_URL").rstrip("/"),

@@ -3,12 +3,14 @@ import asyncio
 import uuid
 from typing import AsyncGenerator
 from typing import AsyncGenerator
-from fastapi import APIRouter, Depends
+from typing import AsyncGenerator
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from app.logging import get_logger
 from app.api.models import ChatRequest, sse_event
 from app.config import settings
 from app.api.deps import verify_token
+from app.db.chat import add_user_message, verify_project_ownership
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage
 
@@ -61,7 +63,20 @@ async def stream_agent(state: FaceAgentState, request_id: str) -> AsyncGenerator
         yield sse_event("done", {})
 
 @router.post("/chat")
-async def chat(request: ChatRequest, user_id: str = Depends(verify_token)):
+async def chat(request: ChatRequest, req: Request, user_id: str = Depends(verify_token)):
+    # Note: request_id removed as per constraints
+    
+    pool = req.app.state.db_pool
+    project_id_str = str(request.project_id)
+    
+    async with pool.acquire() as conn:
+        # 1. Ownership Check
+        if not await verify_project_ownership(conn, project_id_str, user_id):
+            raise HTTPException(status_code=403, detail="Access denied")
+            
+        # 2. Insert User Message
+        await add_user_message(conn, project_id_str, user_id, request.chatInput)
+
     request_id = str(uuid.uuid4())[:8]
     
     selection_count = len(request.selected_ids)

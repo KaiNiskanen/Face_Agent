@@ -1,11 +1,12 @@
 import json
 from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from uuid import UUID
 
 
 class ChatRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    project_id: str
+    project_id: UUID
     chatInput: str
     selected_ids: list[str] = Field(default_factory=list)
     thumb_urls: list[str] = Field(default_factory=list)
