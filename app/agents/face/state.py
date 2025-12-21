@@ -1,5 +1,5 @@
 import operator
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated, NotRequired
 from langchain_core.messages import BaseMessage
 
 class FaceAgentState(TypedDict):
@@ -8,3 +8,8 @@ class FaceAgentState(TypedDict):
     selected_ids: list[str]
     thumb_urls: list[str]
     selection_count: int
+
+    # Bundle A: optional server-owned context. Kept optional to avoid breaking state construction sites.
+    requested_aspect: NotRequired[str | None]
+    # Bundle A: optional client-provided model (accepted from JSON key "model" via alias in ChatRequest).
+    client_model: NotRequired[str | None]

@@ -146,6 +146,9 @@ async def chat(request: ChatRequest, req: Request, user_id: str = Depends(verify
         "selected_ids": request.selected_ids,
         "thumb_urls": thumb_urls_capped,
         "selection_count": selection_count,
+        # Bundle A: pass-through server-owned context (unused for now).
+        "requested_aspect": request.requested_aspect,
+        "client_model": request.client_model,
     }
     return StreamingResponse(
         stream_agent(state, request_id, pool, project_id_str),

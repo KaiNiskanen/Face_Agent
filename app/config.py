@@ -14,6 +14,8 @@ class Settings:
     SUPABASE_JWT_SECRET: str
     JWT_AUDIENCE: str
     CORS_ORIGINS: List[str]
+    # Bundle C: optional n8n webhook URL for generation tool. Must NOT hard-fail startup.
+    N8N_WEBHOOK_URL: str | None = None
 
 def _required(name: str) -> str:
     v = os.getenv(name)
@@ -43,6 +45,8 @@ def _load_settings() -> Settings:
         SUPABASE_JWT_SECRET=_required("SUPABASE_JWT_SECRET"),
         JWT_AUDIENCE=os.getenv("JWT_AUDIENCE", "authenticated"),
         CORS_ORIGINS=cors_origins,
+        # Bundle C: optional. If missing, generate tool returns {ok:false,error_code:"missing_webhook_url",...}
+        N8N_WEBHOOK_URL=os.getenv("N8N_WEBHOOK_URL"),
     )
 
 settings = _load_settings()
