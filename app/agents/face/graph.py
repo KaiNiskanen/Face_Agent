@@ -16,14 +16,6 @@ from app.agents.face.prompts import SPECIALIST_SYSTEM_PROMPTS
 from app.agents.face.state import FaceAgentState
 
 
-# Bundle B: tool args MUST be only {route, intent}
-class GenerateArgs(BaseModel):
-    route: Literal["t2i", "i2i", "m2i", "i2v"] = Field(
-        description="Generation route. Must be one of: t2i, i2i, m2i, i2v."
-    )
-    intent: str = Field(description="Short description of what to generate/edit.")
-
-
 # Bundle C: structured output returned by the specialist LLM call.
 class SpecialistResult(BaseModel):
     prompt: str = Field(description="Final generation/edit prompt.")
@@ -31,12 +23,12 @@ class SpecialistResult(BaseModel):
     model: str = Field(description="Generation model identifier. Must be non-empty.")
 
 
-@tool("generate", args_schema=GenerateArgs)
+@tool("generate")
 async def generate(
     route: Literal["t2i", "i2i", "m2i", "i2v"],
     intent: str,
     state: Annotated[FaceAgentState, InjectedState],
-) -> dict:
+) -> str:
     """Bundle C implementation.
 
     Requirements:

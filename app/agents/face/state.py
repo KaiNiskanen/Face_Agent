@@ -1,5 +1,6 @@
 import operator
-from typing import TypedDict, Annotated, NotRequired
+from typing import Annotated, NotRequired
+from typing_extensions import TypedDict
 from langchain_core.messages import BaseMessage
 
 class FaceAgentState(TypedDict):
